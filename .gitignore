@@ -1,0 +1,14 @@
+**/__pycache__
+**/*.py[cod]
+
+
+# virtual environment
+venv
+
+
+#IDE stuff
+.idea/
+
+
+# Application configuration
+.env
