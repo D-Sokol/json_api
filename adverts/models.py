@@ -8,6 +8,10 @@ class Advertisement(db.Model):
     title = db.Column(db.String(200), nullable=False)
     description = db.Column(db.Text, nullable=False)
 
+    @property
+    def main_photo(self):
+        return Photo.query.filter(Photo.advert_id == self.advert_id).order_by(Photo.photo_id.asc()).first()
+
 
 class Photo(db.Model):
     __tablename__ = 'photos'
