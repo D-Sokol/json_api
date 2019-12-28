@@ -18,7 +18,3 @@ app = create_app()
 
 
 from . import routes
-
-# TODO: create tables with migrations
-with app.app_context():
-    db.create_all()
