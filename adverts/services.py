@@ -10,10 +10,10 @@ def get_advertisements_list(page, order=None, desc=False, page_size=10):
     query = Advertisement.query
     if order is not None:
         field = Advertisement.price if order == 'price' else Advertisement.advert_id
-        field = fields.desc() if desc else field.asc()
+        field = field.desc() if desc else field.asc()
         query = query.order_by(field)
     if page is not None:
-        page += 1
+        page -= 1
         query = query.offset(page * page_size).limit(page_size)
     return query.all()
 
