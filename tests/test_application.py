@@ -49,10 +49,49 @@ class TestGetItem(HTTPTester):
             self.assertEqual(resp.status_code, 200 if exists else 404)
 
     def test_item_found_correct(self):
-        pass
+        self.fill_database()
+        with self.subTest('1'):
+            resp = self.get('/advertisement/1')
+            data = resp.get_json()
+            expected = {'title': 'Snake', 'price': 495.0, 'main_photo': self._link(11)}
+            self.assertDictEqual(data, expected)
+        with self.subTest('2'):
+            resp = self.get('/advertisement/2')
+            data = resp.get_json()
+            expected = {'title': 'Invisible Pink Unicorn', 'price': 20.0, 'main_photo': None}
+            self.assertDictEqual(data, expected)
+        with self.subTest('3'):
+            resp = self.get('/advertisement/3')
+            data = resp.get_json()
+            expected = {'title': 'A cat', 'price': 0.0, 'main_photo': self._link(31)}
+            self.assertDictEqual(data, expected)
 
     def test_additional_fields(self):
-        pass
+        self.fill_database()
+        with self.subTest('All fields'):
+            resp = self.get('/advertisement/1', query_string={'fields': 'all_photos,description'})
+            data = resp.get_json()
+            self.assertIsInstance(data, dict)
+            self.assertEqual(data.get('description'), 'Sell a snake')
+            self.assertListEqual(data.get('all_photos'), [self._link(11), self._link(12)])
+        with self.subTest('Only description'):
+            resp = self.get('/advertisement/1', query_string={'fields': 'description'})
+            data = resp.get_json()
+            self.assertIsInstance(data, dict)
+            self.assertIn('description', data)
+            self.assertNotIn('all_photos', data)
+        with self.subTest('Only photos'):
+            resp = self.get('/advertisement/1', query_string={'fields': 'all_photos'})
+            data = resp.get_json()
+            self.assertIsInstance(data, dict)
+            self.assertNotIn('description', data)
+            self.assertIn('all_photos', data)
+        with self.subTest('No additional fields'):
+            resp = self.get('/advertisement/1', query_string={'fields': ''})
+            data = resp.get_json()
+            self.assertIsInstance(data, dict)
+            self.assertNotIn('description', data)
+            self.assertNotIn('all_photos', data)
 
 
 class TestItemList(HTTPTester):
