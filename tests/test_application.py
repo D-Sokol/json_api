@@ -95,11 +95,70 @@ class TestGetItem(HTTPTester):
 
 
 class TestItemList(HTTPTester):
+    def fill_database(self):
+        # Number of items on page is out of our control,
+        #  so we have to create more than 10 advertisements to test this method properly.
+        for i in range(1, 26):
+            create_advertisement('Title{}'.format(i), 'Description', 10000.0 - 50.0 * i, [self._link(i)])
+
+    def test_format(self):
+        self.fill_database()
+        resp = self.get('/advertisement', query_string={'page': 1})
+        data = resp.get_json()
+        self.assertIsInstance(data, list)
+        self.assertTrue(data)
+
+        obj = data[0]
+        self.assertIsInstance(obj, dict)
+
+        fields = ['title', 'price', 'main_photo']
+        for field in fields:
+            self.assertIn(field, obj)
+        else:
+            self.assertEqual(len(obj), len(fields))
+
     def test_pages(self):
-        pass
+        with self.subTest('First page'):
+            resp = self.get('/advertisement', query_string={'page': 1})
+            data = resp.get_json()
+            self.assertIsInstance(data, list)
+            self.assertEqual(len(data), 10)
+        with self.subTest('Last page'):
+            resp = self.get('/advertisement', query_string={'page': 3})
+            data = resp.get_json()
+            self.assertIsInstance(data, list)
+            self.assertEqual(len(data), 5)
+        with self.subTest('Out-of-range page'):
+            resp = self.get('/advertisement', query_string={'page': 5})
+            data = resp.get_json()
+            self.assertListEqual(data, [])
 
     def test_order(self):
-        pass
+        with self.subTest('ASC'):
+            resp = self.get('/advertisement', query_string={'page': 1, 'sort': 'price', 'order': 'asc'})
+            data = resp.get_json()
+            self.assertIsInstance(data, list)
+            for i, item in enumerate(data, 1):
+                self.assertEqual(data['price'], 10000.0 - 50. * i)
+
+            resp = self.get('/advertisement', query_string={'page': 1, 'sort': 'date', 'order': 'asc'})
+            data = resp.get_json()
+            self.assertIsInstance(data, list)
+            for i, item in enumerate(data, 1):
+                self.assertEqual(data['price'], 10000.0 - 50. * (26-i))
+
+        with self.subTest('DESC'):
+            resp = self.get('/advertisement', query_string={'page': 1, 'sort': 'price', 'order': 'desc'})
+            data = resp.get_json()
+            self.assertIsInstance(data, list)
+            for i, item in enumerate(data, 1):
+                self.assertEqual(data['price'], 10000.0 - 50. * (26-i))
+
+            resp = self.get('/advertisement', query_string={'page': 1, 'sort': 'date', 'order': 'desc'})
+            data = resp.get_json()
+            self.assertIsInstance(data, list)
+            for i, item in enumerate(data, 1):
+                self.assertEqual(data['price'], 10000.0 - 50. * i)
 
 
 class TestCreateItem(HTTPTester):
