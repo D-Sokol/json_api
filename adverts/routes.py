@@ -2,10 +2,11 @@ from flask import request
 
 from . import app
 from . import services
-
+from . import serializers
 
 @app.route('/advertisement/<int:advert_id>', methods=['GET'])
 def get_advert_item(advert_id):
+    
     return 'ok'
 
 
