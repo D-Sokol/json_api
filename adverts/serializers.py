@@ -16,5 +16,24 @@ advertisement_model = {
     "required": ["title", "description", "price"]
 }
 
+
 def validate_advert(json):
     validate(json, advertisement_model)
+
+
+def photo_to_json(photo):
+    return photo.photo_link if photo is not None else None
+
+
+def advert_to_json(advert, fields=''):
+    fields = fields.split(',')
+    json = {
+        'title': advert.title,
+        'price': advert.price,
+        'main_photo': photo_to_json(advert.main_photo),
+    }
+    if 'description' in fields:
+        json['description'] = advert.description
+    if 'all_photos' in fields:
+        json['all_photos'] = list(map(photo_to_json, advert.all_photos))
+    return json
