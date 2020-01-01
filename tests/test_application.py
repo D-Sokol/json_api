@@ -162,8 +162,76 @@ class TestItemList(HTTPTester):
 
 
 class TestCreateItem(HTTPTester):
-    def test_bad_examples(self):
-        pass
+    def _assert_all_fails(self, examples):
+        for example in examples:
+            resp = self.post('/advertisement', data=example)
+            self.assertEqual(resp.status_code, 400)
+        # Check the base is still empty
+        data = self.get('/advertisement').get_json()
+        self.assertListEqual(data, [])
 
-    def test_good_examples(self):
-        pass
+    def test_not_enough_fields(self):
+        bad = [
+            {},
+            # No price
+            {'title': 'Snake', 'description': 'Sell a snake', 'photo_links': ['http://example.com/images/1.png']},
+            # No description
+            {'title': 'Snake', 'price': 1000.0, 'photo_links': ['http://example.com/images/1.png']},
+            # No title
+            {'price': 1000.0, 'description': 'Sell a snake', 'photo_links': ['http://example.com/images/1.png']},
+        ]
+        self._assert_all_fails(bad)
+
+    def test_extra_fields(self):
+        json = {'title': 'Snake',
+                'description': 'Sell a snake',
+                'price': 1000.0,
+                'photo_links': ['http://example.com/images/1.png'],
+                'info': 'string'}
+        self._assert_all_fails((json,))
+
+    def test_strings_too_long(self):
+        bad = [
+            {'title': 'S'*201, 'description': 'Sell a snake', 'price': 1000.0, 'photo_links': ['http://example.com/images/1.png']},
+            {'title': 'Snake', 'description': 'S'*1001, 'price': 1000.0, 'photo_links': ['http://example.com/images/1.png']},
+        ]
+        self._assert_all_fails(bad)
+
+    def test_price_is_not_positive(self):
+        bad = [
+            {'title': 'Snake', 'description': 'Sell a snake', 'price': -50.0, 'photo_links': ['http://example.com/images/1.png']},
+            {'title': 'Snake', 'description': 'Sell a snake', 'price': None, 'photo_links': ['http://example.com/images/1.png']},
+        ]
+        self._assert_all_fails(bad)
+
+    def test_too_many_photos(self):
+        bad = [
+            {'title': 'Snake', 'description': 'Sell a snake', 'price': 42, 'photo_links':
+                ['http://example.com/images/{}.png'.format(i) for i in range(1, 10)]},
+            {'title': 'Snake', 'description': 'Sell a snake', 'price': 42, 'photo_links':
+                ['http://example.com/images/{}.png'.format(i) for i in (1, 2, 3, 4)]},
+        ]
+        self._assert_all_fails(bad)
+
+    def test_accept_good_examples(self):
+        good = [
+            {'title': 'Snake', 'description': 'Sell a snake.', 'price': 1000.0, 'photo_links': []},
+            {'title': 'Unicorn', 'description': 'Sell an unicorn.', 'price': 42, 'photo_links':
+                ['http://example.com/images/{}.png'.format(i) for i in (1, 2, 3)]},
+        ]
+        for example in good:
+            resp = self.post('/advertisement', data=example)
+            self.assertEqual(resp.status_code, 201)
+            data = resp.get_json()
+            self.assertIsInstance(data, dict)
+            self.assertIn('id', data)
+            id_ = data['id']
+
+            resp = self.get('/advertisement/{}'.format(id_), query_string={'fields': 'all_photos,description'})
+            self.assert_equal(resp.status_code, 200)
+            data = rsep.get_json()
+            self.assertIsInstance(data, dict)
+            self.assertEqual(example['title'], data.get('title'))
+            self.assertEqual(example['description'], data.get('description'))
+            self.assertEqual(example['price'], data.get('price'))
+            self.assertListEqual(example['photo_links'], data.get('all_photos'))
