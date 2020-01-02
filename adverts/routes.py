@@ -1,10 +1,11 @@
-from flask import request, jsonify
+from flask import Blueprint, request, jsonify
 
-from . import app
 from . import services
 from . import serializers
 
-@app.route('/advertisement/<int:advert_id>', methods=['GET'])
+bp = Blueprint('advertisements', __name__, url_prefix='/advertisement')
+
+@bp.route('/<int:advert_id>', methods=['GET'])
 def get_advert_item(advert_id):
     return jsonify(serializers.advert_to_json(
         services.get_advertisement(advert_id),
@@ -12,11 +13,11 @@ def get_advert_item(advert_id):
     ))
 
 
-@app.route('/advertisement', methods=['GET'])
+@bp.route('', methods=['GET'])
 def get_advert_collection():
     return 'ok'
 
 
-@app.route('/advertisement', methods=['POST'])
+@bp.route('', methods=['POST'])
 def post_advert():
     return 'ok'

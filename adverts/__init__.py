@@ -12,6 +12,8 @@ def create_app(config_cls=Config):
     app.config.from_object(config_cls)
     db.init_app(app)
     migrate.init_app(app, db)
+    from adverts.routes import bp
+    app.register_blueprint(bp)
     return app
 
 app = create_app()

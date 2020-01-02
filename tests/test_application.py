@@ -9,10 +9,6 @@ from adverts.services import create_advertisement
 class HTTPTester(unittest.TestCase):
     def setUp(self):
         self.app = create_app(TestConfig)
-        # All API functions registered in the original adverts.app object, not in new self.app.
-        # These lines is a hack to copy endpoints.
-        self.app.url_map = app.url_map
-        self.app.view_functions = app.view_functions
 
         self.client = self.app.test_client
         self.context = self.app.app_context()
