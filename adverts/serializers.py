@@ -1,4 +1,4 @@
-from jsonschema import validate
+from jsonschema import validate, ValidationError
 
 advertisement_model = {
     "type": "object",
