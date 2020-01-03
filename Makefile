@@ -1,6 +1,6 @@
 SHELL := /bin/bash
 
-release: upgrade-db install-reqs
+release: upgrade-db install-reqs run-tests
 	# upgrade
 	# new_requirements
 
@@ -20,3 +20,7 @@ upgrade-db: adverts/models.py
 	source venv/bin/activate;\
 	flask db migrate;\
 	flask db upgrade
+
+run-tests:
+	source venv/bin/activate;\
+	python3 test.py
