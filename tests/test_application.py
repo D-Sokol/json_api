@@ -114,6 +114,7 @@ class TestItemList(HTTPTester):
             self.assertEqual(len(obj), len(fields))
 
     def test_pages(self):
+        self.fill_database()
         with self.subTest('First page'):
             resp = self.get('/advertisement', query_string={'page': 1})
             data = resp.get_json()
