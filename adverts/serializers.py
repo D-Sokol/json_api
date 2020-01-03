@@ -17,4 +17,11 @@ advertisement_model = {
 }
 
 def validate_advert(json):
+    """
+    Проверяет, соответствует ли переданный словарь требованиям к модели для создания объявления.
+    Если словарь json не может быть использован для создания объекта объявления,
+    выбрасывается исключение типа jsonschema.ValidationError, в противном случае функция возвращает None.
+    :param dict json:
+    :return None:
+    """
     validate(json, advertisement_model)
