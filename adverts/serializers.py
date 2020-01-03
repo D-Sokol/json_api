@@ -29,10 +29,27 @@ def validate_advert(json):
 
 
 def photo_to_json(photo):
+    """
+    Выполняет сериализацию объекта типа adverts.models.Photo в тип, поддерживаемый JSON.
+    Возвращает строку, представляющую ссылку на фотографию.
+    Если ссылка отсутствует или в качестве аргумента передано None, возвращает None
+    :param Photo photo:
+    :return str:
+    """
     return photo.photo_link if photo is not None else None
 
 
 def advert_to_json(advert, fields=''):
+    """
+    Выполняет сериализацию объекта типа adverts.models.Advertisement в JSON.
+    Возвращает словарь, содержащий название объявления, цену и ссылку на главное фото.
+    Также в результат могут быть включено описание и массив ссылок на все фотографии.
+    Для этого необходимо в качестве параметра fields передать строку, содержащую
+     названия дополнительных полей, разделенные запятой.
+    :param Advertisement advert:
+    :param str fields:
+    :return dict:
+    """
     fields = fields.split(',')
     json = {
         'title': advert.title,
