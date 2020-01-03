@@ -15,8 +15,14 @@ def get_advert_item(advert_id):
 
 @bp.route('', methods=['GET'])
 def get_advert_collection():
-    # Temporary hack to pass tests for object creation
-    return jsonify([])
+    order = request.args.get('sort')
+    desc = (request.args.get('order') == 'desc')
+    page = int(request.args.get('page', 1))
+    adverts = services.get_advertisements_list(page, order, desc)
+    return jsonify([
+        serializers.advert_to_json(advert)
+        for advert in adverts
+    ])
 
 
 @bp.route('', methods=['POST'])
