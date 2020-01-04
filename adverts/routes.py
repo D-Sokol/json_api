@@ -1,10 +1,11 @@
-from flask import request, jsonify
+from flask import Blueprint, request, jsonify
 
-from . import app
 from . import services
 from . import serializers
 
-@app.route('/advertisement/<int:advert_id>', methods=['GET'])
+bp = Blueprint('advertisements', __name__, url_prefix='/advertisement')
+
+@bp.route('/<int:advert_id>', methods=['GET'])
 def get_advert_item(advert_id):
     """
     Возвращает в формате JSON одно ранее созданное объявление, соответствующее переданному ID.
@@ -31,7 +32,7 @@ def get_advert_item(advert_id):
     ))
 
 
-@app.route('/advertisement', methods=['GET'])
+@bp.route('', methods=['GET'])
 def get_advert_collection():
     """
     Возвращает в формате JSON массив объявлений, расположенных на выбранной странице с учетом сортировки.
@@ -46,10 +47,17 @@ def get_advert_collection():
 
     При разбиении на страницы размер страницы принимается равным 10. Это число не регулируется параметрами запроса.
     """
-    return 'ok'
+    order = request.args.get('sort')
+    desc = (request.args.get('order') == 'desc')
+    page = int(request.args.get('page', 1))
+    adverts = services.get_advertisements_list(page, order, desc)
+    return jsonify([
+        serializers.advert_to_json(advert)
+        for advert in adverts
+    ])
 
 
-@app.route('/advertisement', methods=['POST'])
+@bp.route('', methods=['POST'])
 def post_advert():
     """
     Принимает в теле запроса JSON-модель объявления и сохраняет новый объект объявления в базу данных.
@@ -65,4 +73,14 @@ def post_advert():
     Пример тела ответа сервера в случае, когда модель в теле запроса не проходит валидацию:
     "price: -50.0 is less than the minimum of 0.0"
     """
-    return 'ok'
+    data = request.get_json()
+    serializers.validate_advert(data)
+    advert = services.create_advertisement(**data)
+    return jsonify({'id': advert.advert_id}), 201
+
+
+@bp.errorhandler(serializers.ValidationError)
+def validation_error_handler(err):
+    return ("{}: {}".format(err.path[-1] if err.path else 'JSON',
+                           err.message),
+           400)
