@@ -18,7 +18,11 @@ def get_advertisements_list(page, order=None, desc=False, page_size=10):
     return query.all()
 
 
-def create_advertisement(title, description, price, photo_links):
+# Since this function usually calls as create_advertisement(**data),
+#  and there are no guaranteed that data has key 'photo_links',
+#  one should provide reasonable default value.
+# Empty tuple is the best choice, because it is iterable, empty and immutable.
+def create_advertisement(title, description, price, photo_links=()):
     advert = Advertisement(title=title, description=description, price=price)
     db.session.add(advert)
     for link in photo_links:
