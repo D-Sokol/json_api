@@ -2,7 +2,6 @@ version: "3"
 services:
   app:
     build: .
-    #command: make upgrade-db #gunicorn --access-logfile=logs/access.log --error-logfile=logs/errors.log app:app
     depends_on:
       - mysql
     links:
@@ -10,13 +9,13 @@ services:
     ports:
       - '8000:8000'
     environment:
-      DATABASE_URL: 'mysql://avito:cosine-hedgehog@mysql:3306/avito_json?charset=utf8'
+      DATABASE_URL: "mysql://${MYSQL_USER}:${MYSQL_PASSWORD}@${MYSQL_HOST}:${MYSQL_PORT}/${MYSQL_DATABASE}?charset=utf8"
   mysql:
     image: mysql:5.7
     ports:
-      - '32000:3306'
+      - "32000:${MYSQL_PORT}"
     environment:
-      MYSQL_USER: avito
-      MYSQL_PASSWORD: cosine-hedgehog
-      MYSQL_DATABASE: avito_json
-      MYSQL_ROOT_PASSWORD: ruODRkA3oXYejfw?0aPx
+      MYSQL_USER: ${MYSQL_USER}
+      MYSQL_PASSWORD: ${MYSQL_PASSWORD}
+      MYSQL_DATABASE: ${MYSQL_DATABASE}
+      MYSQL_ROOT_PASSWORD: ${MYSQL_ROOT_PASSWORD}

@@ -7,6 +7,7 @@ RUN pip install -r requirements.txt
 
 COPY . ./
 
-RUN make upgrade-db
+#RUN flask db upgrade
+RUN python test.py
 
-CMD gunicorn --access-logfile=logs/access.log --error-logfile=logs/errors.log --bind 0.0.0.0:8000 app:app
+CMD flask db upgrade && gunicorn --access-logfile=logs/access.log --error-logfile=logs/errors.log --bind 0.0.0.0:8000 app:app
