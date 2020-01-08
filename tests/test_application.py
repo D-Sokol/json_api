@@ -212,6 +212,7 @@ class TestCreateItem(HTTPTester):
 
     def test_accept_good_examples(self):
         good = [
+            {'title': 'Snake', 'description': 'Sell a snake.', 'price': 495.0},
             {'title': 'Snake', 'description': 'Sell a snake.', 'price': 1000.0, 'photo_links': []},
             {'title': 'Unicorn', 'description': 'Sell an unicorn.', 'price': 42, 'photo_links':
                 ['http://example.com/images/{}.png'.format(i) for i in (1, 2, 3)]},
@@ -231,4 +232,4 @@ class TestCreateItem(HTTPTester):
             self.assertEqual(example['title'], data.get('title'))
             self.assertEqual(example['description'], data.get('description'))
             self.assertEqual(example['price'], data.get('price'))
-            self.assertListEqual(example['photo_links'], data.get('all_photos'))
+            self.assertListEqual(example.get('photo_links', []), data.get('all_photos'))
