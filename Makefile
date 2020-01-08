@@ -6,7 +6,7 @@ release: upgrade-db install-reqs run-tests
 
 run:
 	source venv/bin/activate;\
-	flask run
+	gunicorn --access-logfile=logs/access.log --error-logfile=logs/errors.log app:app
 
 install-reqs: requirements.txt
 	source venv/bin/activate;\

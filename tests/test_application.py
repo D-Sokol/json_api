@@ -49,17 +49,17 @@ class TestGetItem(HTTPTester):
         with self.subTest('1'):
             resp = self.get('/advertisement/1')
             data = resp.get_json()
-            expected = {'title': 'Snake', 'price': 495.0, 'main_photo': self._link(11)}
+            expected = {'id': 1, 'title': 'Snake', 'price': 495.0, 'main_photo': self._link(11)}
             self.assertDictEqual(data, expected)
         with self.subTest('2'):
             resp = self.get('/advertisement/2')
             data = resp.get_json()
-            expected = {'title': 'Invisible Pink Unicorn', 'price': 20.0, 'main_photo': None}
+            expected = {'id': 2, 'title': 'Invisible Pink Unicorn', 'price': 20.0, 'main_photo': None}
             self.assertDictEqual(data, expected)
         with self.subTest('3'):
             resp = self.get('/advertisement/3')
             data = resp.get_json()
-            expected = {'title': 'A cat', 'price': 0.0, 'main_photo': self._link(31)}
+            expected = {'id': 3, 'title': 'A cat', 'price': 0.0, 'main_photo': self._link(31)}
             self.assertDictEqual(data, expected)
 
     def test_additional_fields(self):
@@ -107,7 +107,7 @@ class TestItemList(HTTPTester):
         obj = data[0]
         self.assertIsInstance(obj, dict)
 
-        fields = ['title', 'price', 'main_photo']
+        fields = ['id', 'title', 'price', 'main_photo']
         for field in fields:
             self.assertIn(field, obj)
         else:
@@ -142,7 +142,7 @@ class TestItemList(HTTPTester):
             data = resp.get_json()
             self.assertIsInstance(data, list)
             for i, item in enumerate(data, 1):
-                self.assertEqual(data['price'], 10000.0 - 50. * (26-i))
+                self.assertEqual(data['id'], 26 - i)
 
         with self.subTest('DESC'):
             resp = self.get('/advertisement', query_string={'page': 1, 'sort': 'price', 'order': 'desc'})
@@ -155,7 +155,7 @@ class TestItemList(HTTPTester):
             data = resp.get_json()
             self.assertIsInstance(data, list)
             for i, item in enumerate(data, 1):
-                self.assertEqual(data['price'], 10000.0 - 50. * i)
+                self.assertEqual(data['id'], i)
 
 
 class TestCreateItem(HTTPTester):
@@ -212,6 +212,7 @@ class TestCreateItem(HTTPTester):
 
     def test_accept_good_examples(self):
         good = [
+            {'title': 'Snake', 'description': 'Sell a snake.', 'price': 495.0},
             {'title': 'Snake', 'description': 'Sell a snake.', 'price': 1000.0, 'photo_links': []},
             {'title': 'Unicorn', 'description': 'Sell an unicorn.', 'price': 42, 'photo_links':
                 ['http://example.com/images/{}.png'.format(i) for i in (1, 2, 3)]},
@@ -231,4 +232,4 @@ class TestCreateItem(HTTPTester):
             self.assertEqual(example['title'], data.get('title'))
             self.assertEqual(example['description'], data.get('description'))
             self.assertEqual(example['price'], data.get('price'))
-            self.assertListEqual(example['photo_links'], data.get('all_photos'))
+            self.assertListEqual(example.get('photo_links', []), data.get('all_photos'))

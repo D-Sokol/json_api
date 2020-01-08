@@ -52,6 +52,7 @@ def advert_to_json(advert, fields=''):
     """
     fields = fields.split(',')
     json = {
+        'id': advert.advert_id,
         'title': advert.title,
         'price': advert.price,
         'main_photo': photo_to_json(advert.main_photo),
