@@ -87,3 +87,8 @@ gunicorn app:app
 ```json
 "price: -1 is less than the minimum of 0.0"
 ```
+
+
+# Ссылки на этот проект
+* [https://bitbucket.org/sokol61/json-api]
+* [https://github.com/D-Sokol/json_api]
