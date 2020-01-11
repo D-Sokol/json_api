@@ -48,4 +48,42 @@ gunicorn app:app
 ```
 
 ## Используемые модели
+* Пример модели объявления в формате JSON в ответе сервера на запрос типа GET со всеми дополнительными полями (см. описание методов):
+```json
+{
+  "all_photos": [
+    "http://example.com/images/11.png",
+    "http://example.com/images/12.png"
+  ],
+  "description": "string",
+  "id": 1,
+  "main_photo": "http://example.com/images/11.png",
+  "price": 495.0,
+  "title": "string"
+}
+```
 
+* Пример модели объявления в формате JSON, ожидаемой сервером в запросе типа POST:
+```json
+{
+  "title": "string",
+  "description": "string",
+  "price": 495.0,
+  "photo_links": [
+    "http://example.com/images/11.png",
+    "http://example.com/images/12.png"
+  ]
+}
+```
+
+* Пример ответа сервера на корректный запрос типа POST:
+```json
+{
+  "id": 1
+}
+```
+
+* Пример ответа сервера на некорректный запрос типа POST:
+```json
+"price: -1 is less than the minimum of 0.0"
+```
