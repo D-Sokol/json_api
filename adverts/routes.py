@@ -50,6 +50,8 @@ def get_advert_collection():
     order = request.args.get('sort')
     desc = (request.args.get('order') == 'desc')
     page = int(request.args.get('page', 1))
+    if page <= 0:
+        raise ValueError("Page number must be positive, got {}".format(page))
     adverts = services.get_advertisements_list(page, order, desc)
     return jsonify([
         serializers.advert_to_json(advert)
@@ -78,6 +80,10 @@ def post_advert():
     advert = services.create_advertisement(**data)
     return jsonify({'id': advert.advert_id}), 201
 
+
+@bp.errorhandler(ValueError)
+def bad_page_number_handler(err):
+    return str(err), 400
 
 @bp.errorhandler(serializers.ValidationError)
 def validation_error_handler(err):
